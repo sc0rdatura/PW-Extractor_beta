@@ -1,0 +1,5 @@
+{
+  "name": "Gridline AI",
+  "description": "A high-performance vertical AI tool for extracting structured film & TV data from PDF newsletters into TSV/CRM ready formats.",
+  "requestFramePermissions": []
+}

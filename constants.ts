@@ -152,7 +152,6 @@ STEP 7: EXTRACT CREDITS
   * Anyone listed under "PRODUCER"
   * Anyone listed under "WRITER/PRODUCER"
   * Anyone listed under "EXECUTIVE PRODUCER"
-- showrunner: Array of showrunner names
 
 STEP 8: CONSTRUCT SEARCH URL
 - Use formula from critical instructions
@@ -183,7 +182,6 @@ Return a JSON array of objects. Each object must have these exact keys:
   "distributor": "string (from header line, or null)",
   "director": ["string", "string"] (array, or empty array),
   "producers": ["string", "string"] (array, combine all producer roles),
-  "showrunner": ["string", "string"] (array, or empty array),
   "searchUrl": "string (complete URL with director/producer)"
 }
 </output_schema>
@@ -197,10 +195,13 @@ INPUT:
 - Target List: "Bunker" (HD)
 - PDF Extract:
   "BUNKER" Feature Film
-  MOD PRODUCCIONES // BLUE MORNING PICTURES // FILMNATION ENTERTAINMENT
-  STATUS: October 1 LOCATION: Madrid, Spain
-  DIRECTOR: Florian Zeller
-  PRODUCER: Federica Sainte-Rose - Fernando Bovaira - Simon de Santiago
+  MOD PRODUCCIONES
+  STATUS: Q4 2025 LOCATION: Madrid, Spain
+  WRITER/DIRECTOR: Florian Zeller
+  PRODUCER: Federica Sainte-Rose - Fernando Bovaira
+  BLUE MORNING PICTURES
+  FILMNATION ENTERTAINMENT
+  CAA MEDIA FINANCE (exclude - sales agent)
 
 OUTPUT:
 {
@@ -217,10 +218,15 @@ OUTPUT:
   "countryLocations": ["Spain"],
   "distributor": null,
   "director": ["Florian Zeller"],
-  "producers": ["Federica Sainte-Rose", "Fernando Bovaira", "Simon De Santiago"],
-  "showrunner": [],
+  "producers": ["Federica Sainte-Rose", "Fernando Bovaira", "Simon De Santiago", ...],
   "searchUrl": "https://www.google.com/search?q=\"Bunker\"+Mod+Producciones+OR+Florian+Zeller"
 }
+
+REASONING DEMONSTRATED:
+- "Q4 2025" converted to 01/10/2025 (Q4 = October start)
+- Status derived: Oct 1 is within 60 days of issue (Nov 20) → "Filming"
+- CAA Media Finance excluded (sales agent, not production company)
+
 
 EXAMPLE 2 - TV Series with Multiple Agents:
 INPUT:

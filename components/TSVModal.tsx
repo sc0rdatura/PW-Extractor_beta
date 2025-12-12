@@ -18,7 +18,7 @@ export const TSVModal: React.FC<TSVModalProps> = ({ isOpen, onClose }) => {
     const headers = [
       'Issue Date', 'Project Name', 'Primary Agent', 'Secondary Agents', 'Type', 'Status',
       'Start Date', 'Primary Company', 'Additional Companies', 'City Locations', 'Country Locations',
-      'Distributor', 'Director', 'Producers', 'Showrunner', 'Search URL'
+      'Distributor', 'Director', 'Producers', 'Search URL'
     ].join('\t');
 
     // Rows
@@ -38,7 +38,6 @@ export const TSVModal: React.FC<TSVModalProps> = ({ isOpen, onClose }) => {
         p.distributor,
         (p.director || []).join('; '),
         (p.producers || []).join('; '),
-        (p.showrunner || []).join('; '),
         p.searchUrl
       ].map(field => (field || '').replace(/\t/g, ' ')).join('\t'); // Remove tabs from content to prevent breaking TSV
     }).join('\n');

@@ -49,7 +49,6 @@ export const DataGrid: React.FC = () => {
               <HeaderCell title="Distributor" />
               <HeaderCell title="Director" />
               <HeaderCell title="Producers" />
-              <HeaderCell title="Showrunner" />
               <HeaderCell title="Search URL" />
             </tr>
           </thead>
@@ -151,10 +150,7 @@ export const DataGrid: React.FC = () => {
                 {/* 14. Producers */}
                 <Cell text={row.producers?.join('; ')} onCopy={() => handleCopy(row.producers?.join('; '))} />
 
-                {/* 15. Showrunner */}
-                <Cell text={row.showrunner?.join('; ')} onCopy={() => handleCopy(row.showrunner?.join('; '))} />
-
-                {/* 16. Search URL */}
+                {/* 15. Search URL */}
                 <Cell text={row.searchUrl} onCopy={() => handleCopy(row.searchUrl)} />
               </tr>
             ))}

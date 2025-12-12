@@ -13,7 +13,6 @@ export interface ProjectData {
   distributor: string;
   director: string[];
   producers: string[];
-  showrunner: string[];
   searchUrl: string;
 }
 

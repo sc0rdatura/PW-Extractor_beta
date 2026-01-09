@@ -6,6 +6,65 @@ import { getAgentFullName } from '../utils/agentMapping';
 export const DataGrid: React.FC = () => {
   const { projects, contacts, showToast, isProcessing } = useStore();
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [focusedRow, setFocusedRow] = useState<number | null>(null);
+
+// Keyboard navigation (row-based)
+React.useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (projects.length === 0) return;
+
+    const numRows = projects.length;
+
+    // If no row focused, focus first row on arrow key
+    if (focusedRow === null) {
+      if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+        e.preventDefault();
+        setFocusedRow(0);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault();
+        setFocusedRow(Math.max(0, focusedRow - 1));
+        break;
+
+      case 'ArrowDown':
+        e.preventDefault();
+        setFocusedRow(Math.min(numRows - 1, focusedRow + 1));
+        break;
+
+      case 'Enter':
+        e.preventDefault();
+        // Copy project name of focused row
+        const project = projects[focusedRow];
+        navigator.clipboard.writeText(project.projectName);
+        showToast(`Copied: ${project.projectName}`);
+        break;
+
+      case 'Escape':
+        e.preventDefault();
+        setFocusedRow(null);
+        break;
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyDown);
+  return () => window.removeEventListener('keydown', handleKeyDown);
+}, [focusedRow, projects, showToast]);
+
+
+
+React.useEffect(() => {
+  if (focusedRow !== null) {
+    const tableRows = document.querySelectorAll('tbody tr');
+    const focusedElement = tableRows[focusedRow];
+    if (focusedElement) {
+      focusedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+}, [focusedRow]);
 
   const handleCopy = (text: string) => {
     if (!text) return;
@@ -24,7 +83,11 @@ export const DataGrid: React.FC = () => {
     </div>
   );
 
+    <div onClick={() => setFocusedRow(null)} className="flex-1 overflow-hidden p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
+    </div>
+  
   return (
+    
     <div className="flex-1 overflow-hidden p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
       <CompanyModal 
         isOpen={!!selectedCompany} 
@@ -56,8 +119,16 @@ export const DataGrid: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-slate-800">
-            {projects.map((row, idx) => (
-              <tr key={idx} className="hover:bg-blue-50 dark:hover:bg-slate-900/50 transition-colors group">
+            {projects.map((row, rowIdx) => (
+  <tr 
+    key={rowIdx} 
+    onClick={() => setFocusedRow(rowIdx)}
+    className={`transition-colors group cursor-pointer ${
+      focusedRow === rowIdx 
+        ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-500 dark:ring-blue-400' 
+        : 'hover:bg-blue-50 dark:hover:bg-slate-900/50'
+    }`}
+  >
                 {/* 1. Issue Date */}
                 <Cell text={row.issueDate} onCopy={() => handleCopy(row.issueDate)} />
                 

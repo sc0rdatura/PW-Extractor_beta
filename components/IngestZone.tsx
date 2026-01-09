@@ -1,3 +1,4 @@
+import { generateTestData } from '../store';
 import React, { useCallback, useState } from 'react';
 import { useStore } from '../store';
 import { extractTextFromPdf } from '../services/pdfService';
@@ -13,7 +14,8 @@ export const IngestZone: React.FC = () => {
     setIsProcessing, setProcessingStage,
     setProjects, setContacts,
     addToHistory,
-    isProcessing, processingStage
+    isProcessing, processingStage,
+    showToast
   } = useStore();
 
   const [fileName, setFileName] = useState<string | null>(null);
@@ -173,32 +175,47 @@ Indiana and the Otter&#39;s Legend (ZH)'
                 </div>
            </div>
         </div>
+{/* Test Data Button (Development) */}
+<div className="lg:col-span-1 flex items-center justify-center">
+  <button
+    onClick={() => {
+      const testData = generateTestData();
+      setProjects(testData.projects);
+      setContacts(testData.contacts);
+      showToast("Test data loaded!");
+    }}
+    className="w-full h-20 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium text-sm flex flex-col items-center justify-center gap-1"
+  >
+    <span>🧪 Test Data</span>
+    <span className="text-xs opacity-75">Dev Only</span>
+  </button>
+</div>
 
-        {/* Action Button */}
-        <div className="lg:col-span-3 flex items-center justify-center">
-            <button 
-                onClick={handleAnalyze}
-                disabled={!isReady || isProcessing}
-                className={`
-                    w-full h-full max-h-40 rounded-xl font-bold text-lg shadow-lg flex flex-col items-center justify-center transition-all
-                    ${isReady && !isProcessing 
-                        ? 'bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white transform hover:scale-[1.02]' 
-                        : 'bg-gray-200 dark:bg-slate-800 text-gray-400 dark:text-slate-600 cursor-not-allowed'}
-                `}
-            >
-                {isProcessing ? (
-                    <>
-                        <Loader2 className="animate-spin w-8 h-8 mb-2" />
-                        <span className="text-sm font-normal animate-pulse">{processingStage}</span>
-                    </>
-                ) : (
-                    <>
-                        <Play className="w-8 h-8 mb-2 fill-current" />
-                        <span>Run Extraction</span>
-                    </>
-                )}
-            </button>
-        </div>
+{/* Action Button */}
+<div className="lg:col-span-2 flex items-center justify-center">
+  <button 
+    onClick={handleAnalyze}
+    disabled={!isReady || isProcessing}
+    className={`
+      w-full h-full max-h-40 rounded-xl font-bold text-lg shadow-lg flex flex-col items-center justify-center transition-all
+      ${isReady && !isProcessing 
+        ? 'bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white transform hover:scale-[1.02]' 
+        : 'bg-gray-200 dark:bg-slate-800 text-gray-400 dark:text-slate-600 cursor-not-allowed'}
+    `}
+  >
+    {isProcessing ? (
+      <>
+        <Loader2 className="animate-spin w-8 h-8 mb-2" />
+        <span className="text-sm font-normal animate-pulse">{processingStage}</span>
+      </>
+    ) : (
+      <>
+        <Play className="w-8 h-8 mb-2 fill-current" />
+        <span>Run Extraction</span>
+      </>
+    )}
+  </button>
+</div>
 
       </div>
     </div>

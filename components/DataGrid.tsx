@@ -82,53 +82,56 @@ React.useEffect(() => {
         <p>No data extracted yet.</p>
     </div>
   );
-
-    <div onClick={() => setFocusedRow(null)} className="flex-1 overflow-hidden p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
-    </div>
   
   return (
-    
-    <div className="flex-1 overflow-hidden p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
-      <CompanyModal 
-        isOpen={!!selectedCompany} 
-        companyName={selectedCompany || ''} 
-        onClose={() => setSelectedCompany(null)} 
-      />
+  <div className="flex-1 overflow-hidden p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
+    <CompanyModal 
+      isOpen={!!selectedCompany} 
+      companyName={selectedCompany || ''} 
+      onClose={() => setSelectedCompany(null)} 
+    />
 
-      <div className={`overflow-x-auto w-full border border-gray-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-950 transition-opacity ${
-  isProcessing ? 'pointer-events-none opacity-50' : ''
-}`}>
-        <table className="w-full border-collapse text-left text-sm whitespace-nowrap">
-          <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
-            <tr>
-              <HeaderCell title="Issue Date" />
-              <HeaderCell title="Project Name" />
-              <HeaderCell title="Primary Agent" />
-              <HeaderCell title="Secondary Agents" />
-              <HeaderCell title="Type" />
-              <HeaderCell title="Status" />
-              <HeaderCell title="Start Date" />
-              <HeaderCell title="Primary Co." />
-              <HeaderCell title="Add. Companies" />
-              <HeaderCell title="City" />
-              <HeaderCell title="Country" />
-              <HeaderCell title="Distributor" />
-              <HeaderCell title="Director" />
-              <HeaderCell title="Producers" />
-              <HeaderCell title="Search URL" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-slate-800">
-            {projects.map((row, rowIdx) => (
-  <tr 
-    key={rowIdx} 
-    onClick={() => setFocusedRow(rowIdx)}
-    className={`transition-colors group cursor-pointer ${
-      focusedRow === rowIdx 
-        ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-500 dark:ring-blue-400' 
-        : 'hover:bg-blue-50 dark:hover:bg-slate-900/50'
-    }`}
-  >
+    <div 
+      className={`overflow-x-auto w-full border border-gray-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-950 transition-opacity ${
+        isProcessing ? 'pointer-events-none opacity-50' : ''
+      }`}
+    >
+      <table className="w-full border-collapse text-left text-sm whitespace-nowrap">
+        <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
+          <tr>
+            <HeaderCell title="Issue Date" />
+            <HeaderCell title="Project Name" />
+            <HeaderCell title="Primary Agent" />
+            <HeaderCell title="Secondary Agents" />
+            <HeaderCell title="Type" />
+            <HeaderCell title="Status" />
+            <HeaderCell title="Start Date" />
+            <HeaderCell title="Primary Co." />
+            <HeaderCell title="Add. Companies" />
+            <HeaderCell title="City" />
+            <HeaderCell title="Country" />
+            <HeaderCell title="Distributor" />
+            <HeaderCell title="Director" />
+            <HeaderCell title="Producers" />
+            <HeaderCell title="Search URL" />
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200 dark:border-slate-800">
+  <tr className="h-1"></tr> {/* Spacer row */}
+  {projects.map((row, rowIdx) => (
+            <tr 
+              key={rowIdx} 
+              onClick={(e) => {
+                e.stopPropagation();
+                setFocusedRow(rowIdx);
+              }}
+              onDoubleClick={() => setFocusedRow(null)}
+              className={`transition-colors group cursor-pointer ${
+                focusedRow === rowIdx 
+                  ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-500 dark:ring-blue-400' 
+                  : 'hover:bg-blue-50 dark:hover:bg-slate-900/50'
+              }`}
+            >
                 {/* 1. Issue Date */}
                 <Cell text={row.issueDate} onCopy={() => handleCopy(row.issueDate)} />
                 

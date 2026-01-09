@@ -1,3 +1,4 @@
+// ⚠️ CRITICAL: This prompt is protected. See PROTECTED_CODE.md before modifying.
 export const PROMPT_PROJECT_EXTRACTION = `
 <system_role>
 You are a precision Data Extraction Engine specialised in film and television industry intelligence.
@@ -133,18 +134,86 @@ STEP 4: FORMAT PROJECT NAME
 - Apply Title Case (with acronym exceptions)
 
 STEP 5: EXTRACT LOCATIONS
-- cityLocations: Extract specific cities OR regions/counties (e.g., "Yorkshire", "Vancouver Island")
-- countryLocations: Extract specific countries
-- Normalisation: "UK" → "United Kingdom"
-- Fallback: If location is a continent (e.g., "Europe"), derive country from primary company address
+
+CRITICAL: The PDF's LOCATION field is inconsistent and may contain:
+- City only (e.g., "New York", "Dublin")
+- City + Country (e.g., "Queensland, Australia")
+- Country only (e.g., "United Kingdom")
+- Multiple countries with "/" separator (e.g., "United Kingdom / United States")
+
+Your task is to extract BOTH cities AND countries using this logic:
+
+CITY EXTRACTION:
+1. Extract specific cities from LOCATION field
+2. Include regions/counties if no city listed (e.g., "Yorkshire")
+3. If LOCATION has format "City, Country" → extract City only for cityLocations
+4. If LOCATION has "/" separator, extract all cities: "London / Paris" → ["London", "Paris"]
+
+COUNTRY EXTRACTION (MULTI-SOURCE LOGIC):
+1. Check LOCATION field:
+   - If contains country name, extract it
+   - If contains "/" separator, extract ALL countries: "UK / US" → ["United Kingdom", "United States"]
+   - Normalize "UK" → "United Kingdom", "US" → "United States"
+2. Infer from cities:
+   - "New York" → United States
+   - "Dublin" → Ireland
+   - "Paris" → France
+   - "London" → United Kingdom
+3. Parse ALL production company addresses:
+   - For each company in primaryCompany AND additionalCompanies
+   - Extract country from company address
+   - Add to countryLocations array (deduplicated)
+4. Combine all sources:
+   - Merge countries from LOCATION + inferred from cities + extracted from company addresses
+   - Remove duplicates
+   - Return as array
+
+EXAMPLES:
+- Input: LOCATION: "Queensland, Australia" | Company: Cornerstone Films (UK address)
+  Output: cityLocations: ["Queensland"], countryLocations: ["Australia", "United Kingdom"]
+
+- Input: LOCATION: "New York" | Company: Night Owl (Santa Monica, CA)
+  Output: cityLocations: ["New York"], countryLocations: ["United States"]
+
+- Input: LOCATION: Not listed | Companies: Rei Pictures (Argentina), Quiddity (Italy), Les Films Du Worso (France), Snowglobe Films (Denmark)
+  Output: cityLocations: [], countryLocations: ["Argentina", "Italy", "France", "Denmark"]
+
+- Input: LOCATION: "Dublin" | Company: Forty Foot Pictures (UK address)
+  Output: cityLocations: ["Dublin"], countryLocations: ["Ireland", "United Kingdom"]
 
 STEP 6: EXTRACT COMPANIES
-- Find all production companies listed
-- Apply Title Case normalisation
-- Exclude SPVs (companies named similarly to project)
-- Split into:
-  * primaryCompany: The first legitimate production company
-  * additionalCompanies: All other companies (array)
+
+Scan the ENTIRE PDF entry for production companies. They appear in two places:
+1. Header block (immediately after project title)
+2. Footer block (after CAST/CREDITS section)
+
+HEADER COMPANIES:
+- Format: "COMPANY NAME // COMPANY NAME // COMPANY NAME"
+- All companies are separated by "//" or newlines
+
+FOOTER COMPANIES:
+- Format: Company name followed by address/contact on next line(s)
+- Each company block separated by blank line or next company name in ALL CAPS
+
+CRITICAL EXCLUSIONS:
+- Sales agents: CAA Media Finance, WME Independent, UTA Independent Film Group, Highland Film Group (when listed separately)
+- Financing entities: Any company with "Finance" or "Capital" in name
+- SPVs: Companies named identically to project title
+
+EXTRACTION PROCESS:
+1. Find ALL company names in header block (between "//" separators)
+2. Find ALL company names in footer block (ALL CAPS lines followed by addresses)
+3. Combine both lists
+4. Apply exclusion rules (sales agents, finance, SPVs)
+5. Apply Title Case normalization
+6. Split into:
+   - primaryCompany: First legitimate company found
+   - additionalCompanies: All remaining companies (array)
+
+EXAMPLE (From Below):
+Header: "PATHLINE PICTURES"
+Footer: "TRUE CURRENCY ... CORNERSTONE FILMS ..."
+Result: primaryCompany: "Pathline Pictures", additionalCompanies: ["True Currency", "Cornerstone Films"]
 
 STEP 7: EXTRACT CREDITS
 - director: Array of director names (semicolon separated in PDF)
@@ -307,21 +376,189 @@ Before generating your JSON output:
 </final_reminders>
 `;
 
+// ⚠️ CRITICAL: This prompt is protected. See PROTECTED_CODE.md before modifying.
 export const PROMPT_CONTACT_INDEXING = `
 <system_role>
-You are a Data Miner. Goal: Create a Contact Dictionary for Production Companies.
+You are a Contact Data Miner. Goal: Create a comprehensive Contact Dictionary for Production Companies.
 </system_role>
-<instructions>
-    1. Input: A list of "Target Projects" and the PDF text.
-    2. Task: Identify the Production Companies attached to these projects.
-    3. Extraction: Find the Address, Phone, and Email for these companies.
-    4. Normalization: Ensure Company Names are Title Case (e.g. "Warner Bros", not "WARNER BROS") so they match the Project JSON.
-</instructions>
+
+<input_variables>
+The user will provide:
+1. Target_List: A list of project names (used to identify relevant companies)
+2. PDF_Text: Raw text extracted from the Production Weekly PDF
+</input_variables>
+
+<task_overview>
+1. Identify all Production Companies mentioned in the PDF that are associated with the Target_List projects
+2. Extract 10 fields of contact information for each company
+3. Normalize company names to Title Case (to match Project extraction output)
+4. Return as JSON Dictionary keyed by company name
+</task_overview>
+
+<extraction_rules>
+For each company, extract these fields:
+
+1. COMPANY_TYPE (classify as one of these):
+   - "Production House" (e.g., Tea Shop Productions, Pathline Pictures)
+   - "Network" (e.g., BBC, HBO, Netflix)
+   - "Distributor" (e.g., Apple TV, Prime Video)
+   - "Studio" (e.g., Warner Bros, Universal, Amazon MGM Studios)
+
+2. WEBSITE (URL format):
+   - Look for: website, url, or domain in contact block
+   - Format: Include https:// prefix if found, otherwise just domain
+   - If not found: null
+
+3. REGION (derive from country):
+   - UK → "Europe"
+   - United States / Canada → "North America"
+   - Australia / New Zealand → "Oceania"
+   - France / Germany / Italy / Spain → "Europe"
+   - If country not clear, infer from company name or address
+
+4. CONTACT_NAME (only if explicitly listed):
+   - Look for: "ATTN:", "Contact:", "c/o", or similar markers
+   - Extract person's name
+   - If not found: null (do not infer or guess)
+
+5. ADDRESS COMPONENTS (parse from single address string):
+   - CITY: Extract city name (e.g., "Los Angeles", "London", "Paris")
+   - ADDRESS: Street address without city/postcode/country (e.g., "6430 Sunset Blvd., Ste 1025")
+   - POSTCODE: Postal/ZIP code (e.g., "90028", "SW1A 1AA")
+   - COUNTRY: Full country name (e.g., "United States", "United Kingdom", "France")
+   
+   Address parsing examples:
+   - "6430 Sunset Blvd., Ste 1025, Los Angeles, CA 90028" 
+     → city: "Los Angeles", address: "6430 Sunset Blvd., Ste 1025", postcode: "90028", country: "United States"
+   - "30 St. Marys Gardens, London SE11 4UF UK"
+     → city: "London", address: "30 St. Marys Gardens", postcode: "SE11 4UF", country: "United Kingdom"
+
+6. PHONE (validate format):
+   - Look for: phone, tel, or numeric patterns
+   - If not found in main entry, check adjacent entries for same company
+   - If not found: null
+
+7. EMAIL (validate format):
+   - Must contain @ symbol and domain
+   - If not found in main entry, check adjacent entries for same company
+   - If invalid format or not found: null
+
+</extraction_rules>
+
+<validation_rules>
+CRITICAL - Apply these checks before returning data:
+
+1. Email validation:
+   - Must contain exactly one @ symbol
+   - Must have text before and after @
+   - Must have domain extension (e.g., .com, .co.uk)
+   - If invalid: set to null
+
+2. Phone validation:
+   - Must contain at least 7 digits
+   - Can include country code (e.g., +1, +44)
+   - If less than 7 digits: set to null
+
+3. Address completeness:
+   - If address string is very short (<10 characters), likely incomplete
+   - If city/country cannot be parsed, set to null
+
+4. Fallback search:
+   - If phone OR email is null, scan OTHER entries in PDF for same company name
+   - Companies often appear multiple times with different contact details
+   - Combine information from all mentions
+
+</validation_rules>
+
+<normalization_rules>
+- Company names: Apply Title Case (e.g., "WARNER BROS" → "Warner Bros")
+- Preserve acronyms: BBC, HBO, MGM, ITV, FX, ABC, NBC, CBS, AMC, SKY
+- Country normalization: "UK" → "United Kingdom", "US" → "United States"
+</normalization_rules>
+
 <output_schema>
-    Return JSON Dictionary:
-    {
-        "Warner Bros": { "address": "String", "phone": "String", "email": "String", "website": "String" },
-        "Big Talk Studios": { "address": "String", "phone": "String", "email": "String", "website": "String" }
-    }
+Return a JSON Dictionary with this structure:
+
+{
+  "Warner Bros": {
+    "company_type": "Studio",
+    "website": "https://warnerbros.com",
+    "region": "North America",
+    "contact_name": "John Smith",
+    "city": "Burbank",
+    "address": "4000 Warner Blvd.",
+    "postcode": "91522",
+    "country": "United States",
+    "phone": "818-954-6000",
+    "email": "careers@warnerbros.com"
+  },
+  "Big Talk Studios": {
+    "company_type": "Production House",
+    "website": null,
+    "region": "Europe",
+    "contact_name": null,
+    "city": "London",
+    "address": "Building 1, 566 Chiswick High Rd.",
+    "postcode": "W4 5YA",
+    "country": "United Kingdom",
+    "phone": "+44 20 8742 9999",
+    "email": "info@bigtalkproductions.com"
+  }
+}
 </output_schema>
+
+<examples>
+EXAMPLE 1:
+Input PDF snippet:
+"FILMNATION ENTERTAINMENT
+6430 Sunset Blvd., Ste 1025, Los Angeles, CA 90028
+323-337-0855
+laoffice@filmnation.com"
+
+Output:
+{
+  "Filmnation Entertainment": {
+    "company_type": "Distributor",
+    "website": null,
+    "region": "North America",
+    "contact_name": null,
+    "city": "Los Angeles",
+    "address": "6430 Sunset Blvd., Ste 1025",
+    "postcode": "90028",
+    "country": "United States",
+    "phone": "323-337-0855",
+    "email": "laoffice@filmnation.com"
+  }
+}
+
+EXAMPLE 2:
+Input PDF snippet:
+"BIG TALK STUDIOS
+Building 1, 566 Chiswick High Rd., London W4 5YA
++44 20 8742 9999
+info@bigtalkproductions.com"
+
+Output:
+{
+  "Big Talk Studios": {
+    "company_type": "Production House",
+    "website": null,
+    "region": "Europe",
+    "contact_name": null,
+    "city": "London",
+    "address": "Building 1, 566 Chiswick High Rd.",
+    "postcode": "W4 5YA",
+    "country": "United Kingdom",
+    "phone": "+44 20 8742 9999",
+    "email": "info@bigtalkproductions.com"
+  }
+}
+</examples>
+
+<final_reminders>
+- Accuracy over completeness: If unsure, set field to null
+- Validate email/phone formats strictly
+- Search entire PDF if main entry lacks phone/email
+- Normalize company names to match Project extraction (Title Case with acronym preservation)
+</final_reminders>
 `;

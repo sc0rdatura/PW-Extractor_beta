@@ -91,12 +91,40 @@ export const IngestZone: React.FC = () => {
         
         {/* PDF Uploader */}
         <div className="lg:col-span-3">
-          <label className={`
-            flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-colors
-            ${fileName 
-                ? 'border-blue-500/50 bg-blue-50 dark:bg-blue-500/5' 
-                : 'border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 hover:bg-gray-100 dark:hover:bg-slate-900'}
-          `}>
+         <label 
+  className={`
+    flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-colors
+    ${fileName 
+      ? 'border-blue-500/50 bg-blue-50 dark:bg-blue-500/5' 
+      : 'border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 hover:bg-gray-100 dark:hover:bg-slate-900'}
+  `}
+  onDragOver={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }}
+  onDragEnter={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }}
+  onDrop={async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const files = e.dataTransfer.files;
+    if (files && files[0] && files[0].type === 'application/pdf') {
+      setFileName(files[0].name);
+      try {
+        const text = await extractTextFromPdf(files[0]);
+        setPdfText(text);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to parse PDF. Ensure PDF.js is loaded.");
+      }
+    } else {
+      alert("Please drop a PDF file");
+    }
+  }}
+>
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               {fileName ? (
                 <>

@@ -3,7 +3,7 @@ import { useStore } from '../store';
 import { CompanyModal } from './CompanyModal';
 
 export const DataGrid: React.FC = () => {
-  const { projects, showToast } = useStore();
+  const { projects, contacts, showToast, isProcessing } = useStore();
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
 
   const handleCopy = (text: string) => {
@@ -31,7 +31,9 @@ export const DataGrid: React.FC = () => {
         onClose={() => setSelectedCompany(null)} 
       />
 
-      <div className="overflow-x-auto w-full border border-gray-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-950">
+      <div className={`overflow-x-auto w-full border border-gray-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-950 transition-opacity ${
+  isProcessing ? 'pointer-events-none opacity-50' : ''
+}`}>
         <table className="w-full border-collapse text-left text-sm whitespace-nowrap">
           <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
             <tr>
@@ -97,8 +99,8 @@ export const DataGrid: React.FC = () => {
                 </td>
 
                 {/* 9. Additional Companies - Interactive Array */}
-                <td className="p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs overflow-hidden">
-                   <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+                <td className="p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs">
+  <div className="flex gap-1 flex-wrap">
                       {row.additionalCompanies && row.additionalCompanies.length > 0 ? row.additionalCompanies.map((co, i) => (
                            <button 
                               key={i}
@@ -144,11 +146,35 @@ export const DataGrid: React.FC = () => {
                 {/* 12. Distributor */}
                 <Cell text={row.distributor} onCopy={() => handleCopy(row.distributor)} />
 
-                {/* 13. Director */}
-                <Cell text={row.director?.join('; ')} onCopy={() => handleCopy(row.director?.join('; '))} />
+               {/* 13. Director */}
+<td className="p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs">
+  <div className="flex gap-1 overflow-x-auto scrollbar-hide flex-wrap">
+    {row.director && row.director.length > 0 ? row.director.map((director, i) => (
+      <span 
+        key={i} 
+        onClick={() => handleCopy(director)}
+        className="cursor-pointer px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-[11px] text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-500/20 transition-colors whitespace-nowrap font-medium"
+      >
+        {director}
+      </span>
+    )) : <span className="text-slate-400">-</span>}
+  </div>
+</td>
 
                 {/* 14. Producers */}
-                <Cell text={row.producers?.join('; ')} onCopy={() => handleCopy(row.producers?.join('; '))} />
+<td className="p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs">
+  <div className="flex gap-1 overflow-x-auto scrollbar-hide flex-wrap">
+    {row.producers && row.producers.length > 0 ? row.producers.map((producer, i) => (
+      <span 
+        key={i} 
+        onClick={() => handleCopy(producer)}
+        className="cursor-pointer px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-[11px] text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 transition-colors whitespace-nowrap font-medium"
+      >
+        {producer}
+      </span>
+    )) : <span className="text-slate-400">-</span>}
+  </div>
+</td>
 
                 {/* 15. Search URL */}
                 <Cell text={row.searchUrl} onCopy={() => handleCopy(row.searchUrl)} />

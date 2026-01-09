@@ -17,10 +17,16 @@ export interface ProjectData {
 }
 
 export interface ContactDetails {
+  company_type: string;
+  website: string;
+  region: string;
+  contact_name: string | null;
+  city: string;
   address: string;
+  postcode: string;
+  country: string;
   phone: string;
   email: string;
-  website: string;
 }
 
 export interface ContactDictionary {

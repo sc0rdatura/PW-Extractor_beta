@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../store';
-import { X, MapPin, Phone, Mail, Globe, Building2 } from 'lucide-react';
+import { X, MapPin, Phone, Mail, Globe, Building2, User, Home } from 'lucide-react';
 
 interface CompanyModalProps {
   companyName: string;
@@ -14,12 +14,19 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, isOpen,
   if (!isOpen) return null;
 
   // Simple fuzzy find logic
-  const findContact = (name: string) => {
-    const key = Object.keys(contacts).find(k => 
-        k.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(k.toLowerCase())
-    );
-    return key ? contacts[key] : null;
-  };
+const findContact = (name: string) => {
+  console.log('🔍 Looking for company:', name);
+  console.log('📦 Available contacts:', Object.keys(contacts));
+  
+  const key = Object.keys(contacts).find(k => 
+    k.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(k.toLowerCase())
+  );
+  
+  console.log('✅ Found key:', key);
+  console.log('📋 Contact details:', key ? contacts[key] : null);
+  
+  return key ? contacts[key] : null;
+};
 
   const details = findContact(companyName);
 
@@ -30,8 +37,14 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, isOpen,
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
+    <div 
+  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+  onClick={onClose}
+>
+      <div 
+  className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-scale-up"
+  onClick={(e) => e.stopPropagation()}
+>
         
         {/* Header */}
         <div className="bg-slate-950 p-6 flex justify-between items-start border-b border-slate-800">
@@ -50,40 +63,76 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({ companyName, isOpen,
         {/* Content */}
         <div className="p-6 space-y-4">
           {details ? (
-            <>
-              <ContactRow 
-                icon={<MapPin size={18} />} 
-                label="Address" 
-                value={details.address} 
-                onCopy={() => copyToClipboard(details.address)} 
-              />
-              <ContactRow 
-                icon={<Phone size={18} />} 
-                label="Phone" 
-                value={details.phone} 
-                onCopy={() => copyToClipboard(details.phone)} 
-              />
-              <ContactRow 
-                icon={<Mail size={18} />} 
-                label="Email" 
-                value={details.email} 
-                onCopy={() => copyToClipboard(details.email)} 
-              />
-              <ContactRow 
-                icon={<Globe size={18} />} 
-                label="Website" 
-                value={details.website} 
-                onCopy={() => copyToClipboard(details.website)} 
-              />
-            </>
-          ) : (
-            <div className="py-8 text-center">
-                <div className="inline-block p-4 rounded-full bg-slate-800/50 mb-4">
-                    <Building2 className="text-slate-600 w-10 h-10" />
-                </div>
-                <p className="text-slate-400">No structured contact data found for this entity.</p>
-            </div>
-          )}
+  <>
+    <ContactRow 
+      icon={<Building2 size={18} />} 
+      label="Company Type" 
+      value={details.company_type} 
+      onCopy={() => copyToClipboard(details.company_type)} 
+    />
+    <ContactRow 
+      icon={<Globe size={18} />} 
+      label="Website" 
+      value={details.website} 
+      onCopy={() => copyToClipboard(details.website)} 
+    />
+    <ContactRow 
+      icon={<MapPin size={18} />} 
+      label="Region" 
+      value={details.region} 
+      onCopy={() => copyToClipboard(details.region)} 
+    />
+    <ContactRow 
+      icon={<User size={18} />} 
+      label="Contact Name" 
+      value={details.contact_name} 
+      onCopy={() => copyToClipboard(details.contact_name)} 
+    />
+    <ContactRow 
+      icon={<MapPin size={18} />} 
+      label="City" 
+      value={details.city} 
+      onCopy={() => copyToClipboard(details.city)} 
+    />
+    <ContactRow 
+      icon={<Home size={18} />} 
+      label="Address" 
+      value={details.address} 
+      onCopy={() => copyToClipboard(details.address)} 
+    />
+    <ContactRow 
+      icon={<MapPin size={18} />} 
+      label="Postcode" 
+      value={details.postcode} 
+      onCopy={() => copyToClipboard(details.postcode)} 
+    />
+    <ContactRow 
+      icon={<Globe size={18} />} 
+      label="Country" 
+      value={details.country} 
+      onCopy={() => copyToClipboard(details.country)} 
+    />
+    <ContactRow 
+      icon={<Phone size={18} />} 
+      label="Phone" 
+      value={details.phone} 
+      onCopy={() => copyToClipboard(details.phone)} 
+    />
+    <ContactRow 
+      icon={<Mail size={18} />} 
+      label="Email" 
+      value={details.email} 
+      onCopy={() => copyToClipboard(details.email)} 
+    />
+  </>
+) : (
+  <div className="py-8 text-center">
+    <div className="inline-block p-4 rounded-full bg-slate-800/50 mb-4">
+      <Building2 className="text-slate-600 w-10 h-10" />
+    </div>
+    <p className="text-slate-400">No structured contact data found for this entity.</p>
+  </div>
+)}
         </div>
 
         <div className="bg-slate-950/50 p-4 border-t border-slate-800 text-center">

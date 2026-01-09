@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
 import { CompanyModal } from './CompanyModal';
+import { getAgentFullName } from '../utils/agentMapping';
 
 export const DataGrid: React.FC = () => {
   const { projects, contacts, showToast, isProcessing } = useStore();
@@ -64,10 +65,13 @@ export const DataGrid: React.FC = () => {
                 <Cell text={row.projectName} onCopy={() => handleCopy(row.projectName)} bold />
                 
                 {/* 3. Primary Agent */}
-                <Cell text={row.primaryAgent} onCopy={() => handleCopy(row.primaryAgent)} />
+<Cell text={getAgentFullName(row.primaryAgent)} onCopy={() => handleCopy(row.primaryAgent)} />
                 
                 {/* 4. Secondary Agents */}
-                <Cell text={row.secondaryAgents} onCopy={() => handleCopy(row.secondaryAgents)} />
+<Cell 
+  text={row.secondaryAgents ? row.secondaryAgents.split(';').map(a => getAgentFullName(a.trim())).join('; ') : ''} 
+  onCopy={() => handleCopy(row.secondaryAgents)} 
+/>
                 
                 {/* 5. Type */}
                 <td className="p-3 border-r border-gray-200 dark:border-slate-800/50 text-slate-500 dark:text-slate-400">

@@ -160,14 +160,16 @@ export const IngestZone: React.FC = () => {
                 </div>
                 <div className="w-2/3">
                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <List size={12} /> Target Context (Projects/Companies)
-                    </label>
-                    <textarea 
-                        value={targetList}
-                        onChange={(e) => setTargetList(e.target.value)}
-                        placeholder="Paste specific projects to guide AI (Optional)..."
-                        className="w-full h-[88px] bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:ring-1 focus:ring-blue-500 outline-none resize-none placeholder-slate-400 dark:placeholder-slate-600"
-                    />
+  <List size={12} /> Project Names & Agent Initials
+</label>
+<textarea 
+  value={targetList}
+  onChange={(e) => setTargetList(e.target.value)}
+  placeholder='e.g. Bunker (HD)
+The Good Samaritan (HD & ZH)
+Indiana and the Otter&#39;s Legend (ZH)'
+  className="w-full h-[88px] bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:ring-1 focus:ring-blue-500 outline-none resize-none placeholder-slate-400 dark:placeholder-slate-600"
+/>
                 </div>
            </div>
         </div>

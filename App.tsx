@@ -50,10 +50,11 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        {/* Scrollable Workflow Area */}
-        <div className="flex-1 overflow-y-auto flex flex-col scroll-smooth">
-          <IngestZone />
-          <DataGrid />
+        {/* Scrollable Content Area - Unified */}
+        <div className="flex-1 min-h-0 relative">
+          <DataGrid>
+            <IngestZone />
+          </DataGrid>
         </div>
 
       </div>

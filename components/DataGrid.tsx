@@ -4,7 +4,11 @@ import { CompanyModal } from './CompanyModal';
 import { getAgentFullName } from '../utils/agentMapping';
 import { ProjectData } from '../types';
 
-export const DataGrid: React.FC = () => {
+interface DataGridProps {
+  children?: React.ReactNode;
+}
+
+export const DataGrid: React.FC<DataGridProps> = ({ children }) => {
   const { projects, contacts, showToast, isProcessing } = useStore();
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [focusedCell, setFocusedCell] = useState<{ 
@@ -300,23 +304,32 @@ React.useEffect(() => {
     return focusedCell?.row === rowIdx && focusedCell?.col === colIdx;
   };
 
-  if (!projects.length) return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-500 dark:text-slate-600">
+  if (!projects.length && !children) return (
+    <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-500 dark:text-slate-600 h-full">
       <p>No data extracted yet.</p>
     </div>
   );
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
+    <div className="h-full flex flex-col p-4 bg-gray-50 dark:bg-slate-950">
       <CompanyModal 
         isOpen={!!selectedCompany} 
         companyName={selectedCompany || ''} 
         onClose={() => setSelectedCompany(null)} 
       />
 
-      <div className={`overflow-x-auto w-full border border-gray-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-950 transition-opacity ${
+      <div className={`flex-1 overflow-auto w-full border border-gray-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-950 transition-opacity ${
         isProcessing ? 'pointer-events-none opacity-50' : ''
       }`}>
+        
+        {/* Render IngestZone or other header content inside the scroll container */}
+        {children && (
+           <div className="sticky left-0 z-0 bg-gray-50 dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800">
+              {children}
+           </div>
+        )}
+
+        {projects.length > 0 ? (
         <table className="w-full border-collapse text-left text-sm whitespace-nowrap">
           <thead className="bg-gray-100 dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
             <tr>
@@ -344,7 +357,7 @@ React.useEffect(() => {
   onDoubleClick={() => setFocusedCell(null)}
   className={`transition-colors group ${
     focusedCell?.row === rowIdx
-      ? 'bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-500 dark:ring-blue-400'
+      ? 'bg-blue-50 dark:bg-blue-900/20 outline outline-2 outline-blue-500 dark:outline-blue-400 outline-offset--2'
       : rowIdx % 2 === 0
         ? 'bg-white dark:bg-slate-950 hover:bg-blue-50 dark:hover:bg-slate-900/50'
         : 'bg-gray-50/50 dark:bg-slate-900/20 hover:bg-blue-50 dark:hover:bg-slate-900/50'
@@ -682,6 +695,13 @@ className={`cursor-pointer px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emera
             ))}
           </tbody>
         </table>
+        ) : (
+            // Empty State inside scroll area so it pushes IngestZone up if needed? 
+            // Actually if empty, the IngestZone is just there.
+            <div className="flex flex-col items-center justify-center p-8 text-slate-500 dark:text-slate-600">
+               <p>No projects loaded.</p>
+            </div>
+        )}
       </div>
     </div>
   );

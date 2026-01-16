@@ -64,14 +64,46 @@ React.useEffect(() => {
       case 'ArrowLeft':
         e.preventDefault();
         if (col > 0) {
-          setFocusedCell({ row, col: col - 1 });
+          const prevCol = col - 1;
+          const prevProject = projects[row];
+
+          // Check if previous cell has items (even single ones need subIndex 0 for badge highlight)
+          const hasItems = (
+            (prevCol === 8 && prevProject.additionalCompanies?.length > 0) ||
+            (prevCol === 9 && prevProject.cityLocations?.length > 0) ||
+            (prevCol === 10 && prevProject.countryLocations?.length > 0) ||
+            (prevCol === 12 && prevProject.director?.length > 0) ||
+            (prevCol === 13 && prevProject.producers?.length > 0)
+          );
+
+          setFocusedCell({
+            row,
+            col: prevCol,
+            subIndex: hasItems ? 0 : undefined
+          });
         }
         break;
 
       case 'ArrowRight':
         e.preventDefault();
         if (col < numCols - 1) {
-          setFocusedCell({ row, col: col + 1 });
+          const nextCol = col + 1;
+          const nextProject = projects[row];
+
+          // Check if next cell has items (even single ones need subIndex 0 for badge highlight)
+          const hasItems = (
+            (nextCol === 8 && nextProject.additionalCompanies?.length > 0) ||
+            (nextCol === 9 && nextProject.cityLocations?.length > 0) ||
+            (nextCol === 10 && nextProject.countryLocations?.length > 0) ||
+            (nextCol === 12 && nextProject.director?.length > 0) ||
+            (nextCol === 13 && nextProject.producers?.length > 0)
+          );
+
+          setFocusedCell({
+            row,
+            col: nextCol,
+            subIndex: hasItems ? 0 : undefined
+          });
         }
         break;
 
@@ -88,12 +120,26 @@ React.useEffect(() => {
       setFocusedCell({ row: row - 1, col: numCols - 1 });
     }
   } else {
-    // Tab: Check if we're in a multi-item cell
+    // Tab: Check if we're in a multi-item cell and need to iterate sub-items
     let movedToSubItem = false;
     
     // Additional Companies (col 8)
     if (col === 8 && project.additionalCompanies && project.additionalCompanies.length > 1) {
       if (subIndex < project.additionalCompanies.length - 1) {
+        setFocusedCell({ row, col, subIndex: subIndex + 1 });
+        movedToSubItem = true;
+      }
+    }
+    // Cities (col 9)
+    else if (col === 9 && project.cityLocations && project.cityLocations.length > 1) {
+      if (subIndex < project.cityLocations.length - 1) {
+        setFocusedCell({ row, col, subIndex: subIndex + 1 });
+        movedToSubItem = true;
+      }
+    }
+    // Countries (col 10)
+    else if (col === 10 && project.countryLocations && project.countryLocations.length > 1) {
+      if (subIndex < project.countryLocations.length - 1) {
         setFocusedCell({ row, col, subIndex: subIndex + 1 });
         movedToSubItem = true;
       }
@@ -116,9 +162,25 @@ React.useEffect(() => {
     // If we didn't move to a sub-item, move to next cell
     if (!movedToSubItem) {
       if (col < numCols - 1) {
-        setFocusedCell({ row, col: col + 1 });
+        const nextCol = col + 1;
+        const nextProject = projects[row];
+        
+        // Check if next cell has items (even single ones need subIndex 0 for badge highlight)
+        const hasItems = (
+          (nextCol === 8 && nextProject.additionalCompanies?.length > 0) ||
+          (nextCol === 9 && nextProject.cityLocations?.length > 0) ||
+          (nextCol === 10 && nextProject.countryLocations?.length > 0) ||
+          (nextCol === 12 && nextProject.director?.length > 0) ||
+          (nextCol === 13 && nextProject.producers?.length > 0)
+        );
+        
+        setFocusedCell({ 
+          row, 
+          col: nextCol, 
+          subIndex: hasItems ? 0 : undefined 
+        });
       } else if (row < numRows - 1) {
-        setFocusedCell({ row: row + 1, col: 0 });
+        setFocusedCell({ row: row + 1, col: 0, subIndex: undefined });
       }
     }
   }
@@ -139,6 +201,14 @@ React.useEffect(() => {
         navigator.clipboard.writeText(company);
         showToast("Copied!");
       }
+      break;
+    } else if (col === 9 && projectData.cityLocations) {
+      navigator.clipboard.writeText(projectData.cityLocations[focusedCell.subIndex]);
+      showToast("Copied!");
+      break;
+    } else if (col === 10 && projectData.countryLocations) {
+      navigator.clipboard.writeText(projectData.countryLocations[focusedCell.subIndex]);
+      showToast("Copied!");
       break;
     } else if (col === 12 && projectData.director) {
       navigator.clipboard.writeText(projectData.director[focusedCell.subIndex]);
@@ -237,7 +307,7 @@ React.useEffect(() => {
   );
 
   return (
-    <div className="flex-1 overflow-hidden p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
+    <div className="p-4 bg-gray-50 dark:bg-slate-950 flex flex-col">
       <CompanyModal 
         isOpen={!!selectedCompany} 
         companyName={selectedCompany || ''} 
@@ -282,7 +352,10 @@ React.useEffect(() => {
 >
                 {/* 1. Issue Date */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 0 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 0 });
+                    handleCopy(row.issueDate);
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 0)
   ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -294,7 +367,10 @@ React.useEffect(() => {
 
                 {/* 2. Project Name */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 1 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 1 });
+                    handleCopy(row.projectName);
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-900 dark:text-slate-100 font-medium transition-colors ${
                     isCellFocused(rowIdx, 1)
   ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -306,7 +382,10 @@ React.useEffect(() => {
 
                 {/* 3. Primary Agent */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 2 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 2 });
+                    handleCopy(getAgentFullName(row.primaryAgent));
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 2)
   ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -318,7 +397,10 @@ React.useEffect(() => {
 
                 {/* 4. Secondary Agents */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 3 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 3 });
+                    handleCopy(row.secondaryAgents ? row.secondaryAgents.split(';').map(a => getAgentFullName(a.trim())).join('; ') : '');
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 3)
   ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -332,7 +414,10 @@ React.useEffect(() => {
 
                 {/* 5. Type */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 4 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 4 });
+                    handleCopy(row.type);
+                  }}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 4)
   ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -350,7 +435,10 @@ React.useEffect(() => {
 
                 {/* 6. Status */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 5 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 5 });
+                    handleCopy(row.status);
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 5)
                         ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -362,7 +450,10 @@ React.useEffect(() => {
 
                 {/* 7. Start Date */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 6 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 6 });
+                    handleCopy(row.startDate);
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 6)
                       ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -383,14 +474,23 @@ React.useEffect(() => {
                 >
                   {row.primaryCompany ? (
                     <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openCompany(e, row.primaryCompany);
-                      }}
-                      className="px-2 py-1 bg-blue-100 dark:bg-blue-500/10 hover:bg-blue-200 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 rounded text-xs font-medium transition-colors"
-                    >
-                      {row.primaryCompany}
-                    </button>
+  onClick={(e) => {
+    e.stopPropagation();
+    setFocusedCell({ row: rowIdx, col: 7 });
+    if (e.ctrlKey || e.metaKey) {
+      openCompany(e, row.primaryCompany);
+    } else {
+      handleCopy(row.primaryCompany);
+    }
+  }}
+  className={`px-2 py-1 bg-blue-100 dark:bg-blue-500/10 hover:bg-blue-200 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 rounded text-xs font-medium transition-all duration-120 ease-in-out outline-none focus:outline-none ${
+  focusedCell?.row === rowIdx && focusedCell?.col === 7
+    ? 'ring-2 ring-blue-400/40 scale-102'
+    : ''
+}`}
+>
+  {row.primaryCompany}
+</button>
                   ) : <span className="text-slate-400">-</span>}
                 </td>
 
@@ -406,15 +506,24 @@ React.useEffect(() => {
                   <div className="flex gap-1 flex-wrap">
                     {row.additionalCompanies && row.additionalCompanies.length > 0 ? row.additionalCompanies.map((co, i) => (
                       <button 
-                        key={i}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openCompany(e, co);
-                        }}
-                        className="px-2 py-1 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 rounded text-xs whitespace-nowrap"
-                      >
-                        {co}
-                      </button>
+  key={i}
+  onClick={(e) => {
+    e.stopPropagation();
+    setFocusedCell({ row: rowIdx, col: 8, subIndex: i });
+    if (e.ctrlKey || e.metaKey) {
+      openCompany(e, co);
+    } else {
+      handleCopy(co);
+    }
+  }}
+  className={`px-2 py-1 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 rounded text-xs whitespace-nowrap transition-all duration-120 ease-in-out outline-none focus:outline-none ${
+  focusedCell?.row === rowIdx && focusedCell?.col === 8 && focusedCell?.subIndex === i
+    ? 'ring-2 ring-slate-400/40 scale-102'
+    : ''
+}`}
+>
+  {co}
+</button>
                     )) : <span className="text-slate-400">-</span>}
                   </div>
                 </td>
@@ -434,9 +543,14 @@ React.useEffect(() => {
                         key={i} 
                         onClick={(e) => {
                           e.stopPropagation();
+                          setFocusedCell({ row: rowIdx, col: 9, subIndex: i });
                           handleCopy(city);
                         }}
-                        className="cursor-pointer px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-[10px] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                        className={`cursor-pointer px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-[10px] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all duration-120 ease-in-out outline-none focus:outline-none ${
+                          focusedCell?.row === rowIdx && focusedCell?.col === 9 && focusedCell?.subIndex === i
+                            ? 'ring-2 ring-blue-400/40 scale-102'
+                            : ''
+                        }`}
                       >
                         {city}
                       </span>
@@ -459,9 +573,14 @@ React.useEffect(() => {
                         key={i} 
                         onClick={(e) => {
                           e.stopPropagation();
+                          setFocusedCell({ row: rowIdx, col: 10, subIndex: i });
                           handleCopy(country);
                         }}
-                        className="cursor-pointer px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-[10px] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                        className={`cursor-pointer px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-[10px] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all duration-120 ease-in-out outline-none focus:outline-none ${
+                          focusedCell?.row === rowIdx && focusedCell?.col === 10 && focusedCell?.subIndex === i
+                            ? 'ring-2 ring-blue-400/40 scale-102'
+                            : ''
+                        }`}
                       >
                         {country}
                       </span>
@@ -471,7 +590,10 @@ React.useEffect(() => {
 
                 {/* 12. Distributor */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 11 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 11 });
+                    handleCopy(row.distributor);
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 11)
                       ? 'bg-blue-100/50 dark:bg-blue-800/30'
@@ -491,17 +613,23 @@ React.useEffect(() => {
                   }`}
                 >
                   <div className="flex gap-1 flex-wrap">
-                    {row.director && row.director.length > 0 ? row.director.map((director, i) => (
-                      <span 
-                        key={i} 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopy(director);
-                        }}
-                        className="cursor-pointer px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-[11px] text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-500/20 transition-colors whitespace-nowrap font-medium active:scale-95"
-                      >
-                        {director}
-                      </span>
+                    {row.director && row.director.length > 0 ? row.director.map((director, i) => (               
+<span 
+  key={i} 
+  onClick={(e) => {
+    e.stopPropagation();
+    setFocusedCell({ row: rowIdx, col: 12, subIndex: i });
+    handleCopy(director);
+  }}
+  className={`cursor-pointer px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-[11px] text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-500/20 transition-all duration-120 ease-in-out whitespace-nowrap font-medium active:scale-95 outline-none focus:outline-none ${
+    focusedCell?.row === rowIdx && focusedCell?.col === 12 && focusedCell?.subIndex === i
+      ? 'ring-2 ring-purple-400/40 scale-102'
+      : ''
+  }`}
+>
+  {director}
+</span>
+
                     )) : <span className="text-slate-400">-</span>}
                   </div>
                 </td>
@@ -518,22 +646,30 @@ React.useEffect(() => {
                   <div className="flex gap-1 flex-wrap">
                     {row.producers && row.producers.length > 0 ? row.producers.map((producer, i) => (
                       <span 
-                        key={i} 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopy(producer);
-                        }}
-                        className="cursor-pointer px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-[11px] text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 transition-colors whitespace-nowrap font-medium active:scale-95"
-                      >
-                        {producer}
-                      </span>
+  key={i} 
+  onClick={(e) => {
+    e.stopPropagation();
+    setFocusedCell({ row: rowIdx, col: 13, subIndex: i });
+    handleCopy(producer);
+  }}
+className={`cursor-pointer px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-[11px] text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 transition-all duration-120 ease-in-out whitespace-nowrap font-medium active:scale-95 outline-none focus:outline-none ${
+  focusedCell?.row === rowIdx && focusedCell?.col === 13 && focusedCell?.subIndex === i
+    ? 'ring-2 ring-emerald-400/40 scale-102'
+    : ''
+}`}
+>
+  {producer}
+</span>
                     )) : <span className="text-slate-400">-</span>}
                   </div>
                 </td>
 
                 {/* 15. Search URL */}
                 <td
-                  onClick={() => setFocusedCell({ row: rowIdx, col: 14 })}
+                  onClick={() => {
+                    setFocusedCell({ row: rowIdx, col: 14 });
+                    handleCopy(row.searchUrl);
+                  }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 14)
                       ? 'bg-blue-100/50 dark:bg-blue-800/30'

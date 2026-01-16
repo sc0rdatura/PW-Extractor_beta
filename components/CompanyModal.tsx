@@ -49,29 +49,32 @@ return (
     tabIndex={-1}
   >
       <div 
-  className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-scale-up"
+  className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]"
   onClick={(e) => e.stopPropagation()}
 >
         
-        {/* Header */}
-        <div className="bg-slate-950 p-6 flex justify-between items-start border-b border-slate-800">
-          <div>
+        {/* Header - Centered Title */}
+        <div className="bg-slate-950 p-6 relative flex items-center justify-center border-b border-slate-800 shrink-0">
+          <div className="text-center px-8">
             <h3 
-  onClick={() => copyToClipboard(companyName)}
-  className="text-xl font-bold text-slate-100 flex items-center gap-2 cursor-pointer hover:text-blue-400 transition-colors"
->
-  <Building2 className="text-blue-500" size={20} />
-  {companyName}
-</h3>
-            <p className="text-sm text-slate-500 mt-1">Company Details</p>
+              onClick={() => copyToClipboard(companyName)}
+              className="text-lg font-bold text-slate-100 flex items-center justify-center gap-2 cursor-pointer hover:text-blue-400 transition-colors"
+            >
+              <Building2 className="text-blue-500 shrink-0" size={20} />
+              <span className="truncate">{companyName}</span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 uppercase tracking-wide">Company Details</p>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
+          <button 
+            onClick={onClose} 
+            className="absolute right-4 top-4 text-slate-500 hover:text-slate-300 transition-colors p-2 hover:bg-slate-800 rounded-lg"
+          >
             <X size={20} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-4">
+        {/* Content - Scrollable */}
+        <div className="p-6 space-y-4 overflow-y-auto flex-1">
           {details ? (
   <>
     <ContactRow 
@@ -145,7 +148,7 @@ return (
 )}
         </div>
 
-        <div className="bg-slate-950/50 p-4 border-t border-slate-800 text-center">
+        <div className="bg-slate-950/50 p-4 border-t border-slate-800 text-center shrink-0">
             <button onClick={onClose} className="text-sm text-slate-500 hover:text-slate-300">Close Panel</button>
         </div>
       </div>

@@ -20,14 +20,14 @@ const App: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         
-        {/* Top Bar */}
+        {/* Top Bar - Fixed */}
         <header className="h-14 bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0 z-20">
           <div className="flex items-center gap-3">
-  <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
-    <Grid size={18} className="text-white" />
-  </div>
-  <h1 className="font-bold text-lg tracking-tight text-slate-900 dark:text-slate-100">PW Extractor</h1>
-</div>
+            <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
+              <Grid size={18} className="text-white" />
+            </div>
+            <h1 className="font-bold text-lg tracking-tight text-slate-900 dark:text-slate-100">PW Extractor</h1>
+          </div>
           
           <div className="flex items-center gap-4">
              {/* Theme Toggle */}
@@ -50,11 +50,11 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        {/* Workflow Area */}
-        <IngestZone />
-
-        {/* Main Grid Area */}
-        <DataGrid />
+        {/* Scrollable Workflow Area */}
+        <div className="flex-1 overflow-y-auto flex flex-col scroll-smooth">
+          <IngestZone />
+          <DataGrid />
+        </div>
 
       </div>
 

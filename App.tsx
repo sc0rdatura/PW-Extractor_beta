@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from './store';
 import { IngestZone } from './components/IngestZone';
 import { DataGrid } from './components/DataGrid';
@@ -10,6 +10,15 @@ import { Grid, Download, Sun, Moon } from 'lucide-react';
 const App: React.FC = () => {
   const { projects, theme, toggleTheme } = useStore();
   const [tsvOpen, setTsvOpen] = useState(false);
+
+  // Sync theme with HTML element on mount
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   return (
     <div className={`flex h-screen bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 ${theme}`}>

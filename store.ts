@@ -19,6 +19,13 @@ const saveHistory = (history: ImportBatch[]) => {
   }
 };
 
+const getSystemTheme = (): 'dark' | 'light' => {
+  if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
+  }
+  return 'light';
+};
+
 export const useStore = create<AppState>((set, get) => ({
   pdfText: '',
   setPdfText: (text) => set({ pdfText: text }),
@@ -63,7 +70,7 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
-  theme: 'dark',
+  theme: getSystemTheme(),
   toggleTheme: () => {
     const newTheme = get().theme === 'dark' ? 'light' : 'dark';
     set({ theme: newTheme });

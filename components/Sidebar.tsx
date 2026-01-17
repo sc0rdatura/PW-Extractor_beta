@@ -4,7 +4,7 @@ import { History, ChevronLeft, ChevronRight, Database, Clock } from 'lucide-reac
 
 export const Sidebar: React.FC = () => {
   const { history, restoreFromHistory } = useStore();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <div 

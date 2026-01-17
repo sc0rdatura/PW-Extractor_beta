@@ -371,7 +371,7 @@ React.useEffect(() => {
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 0)
-  ? 'bg-blue-100/50 dark:bg-blue-800/30'
+  ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -386,7 +386,7 @@ React.useEffect(() => {
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-900 dark:text-slate-100 font-medium transition-colors ${
                     isCellFocused(rowIdx, 1)
-  ? 'bg-blue-100/50 dark:bg-blue-800/30'
+  ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -401,7 +401,7 @@ React.useEffect(() => {
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 2)
-  ? 'bg-blue-100/50 dark:bg-blue-800/30'
+  ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -416,7 +416,7 @@ React.useEffect(() => {
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 3)
-  ? 'bg-blue-100/50 dark:bg-blue-800/30'
+  ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -433,7 +433,7 @@ React.useEffect(() => {
                   }}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 4)
-  ? 'bg-blue-100/50 dark:bg-blue-800/30'
+  ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -454,7 +454,7 @@ React.useEffect(() => {
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 5)
-                        ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                        ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -469,7 +469,7 @@ React.useEffect(() => {
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 6)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -481,7 +481,7 @@ React.useEffect(() => {
                   onClick={() => setFocusedCell({ row: rowIdx, col: 7 })}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 7)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -512,7 +512,7 @@ React.useEffect(() => {
                   onClick={() => setFocusedCell({ row: rowIdx, col: 8 })}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 8)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -546,7 +546,7 @@ React.useEffect(() => {
                   onClick={() => setFocusedCell({ row: rowIdx, col: 9 })}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 9)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -576,7 +576,7 @@ React.useEffect(() => {
                   onClick={() => setFocusedCell({ row: rowIdx, col: 10 })}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 10)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -609,7 +609,7 @@ React.useEffect(() => {
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 11)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -621,7 +621,7 @@ React.useEffect(() => {
                   onClick={() => setFocusedCell({ row: rowIdx, col: 12 })}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 12)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -652,7 +652,7 @@ React.useEffect(() => {
                   onClick={() => setFocusedCell({ row: rowIdx, col: 13 })}
                   className={`p-3 border-r border-gray-200 dark:border-slate-800/50 max-w-xs cursor-pointer transition-colors ${
                     isCellFocused(rowIdx, 13)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >
@@ -685,7 +685,7 @@ className={`cursor-pointer px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emera
                   }}
                   className={`px-4 py-3 border-r border-gray-200 dark:border-slate-800/50 cursor-pointer select-none text-slate-600 dark:text-slate-400 transition-colors ${
                     isCellFocused(rowIdx, 14)
-                      ? 'bg-blue-100/50 dark:bg-blue-800/30'
+                      ? 'bg-blue-200 dark:bg-blue-800/30'
   : 'hover:bg-blue-50 dark:hover:bg-blue-500/5'
                   }`}
                 >

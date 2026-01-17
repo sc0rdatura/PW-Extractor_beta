@@ -4,12 +4,14 @@ import { IngestZone } from './components/IngestZone';
 import { DataGrid } from './components/DataGrid';
 import { Toast } from './components/Toast';
 import { TSVModal } from './components/TSVModal';
+import { HelpModal } from './components/HelpModal';
 import { Sidebar } from './components/Sidebar';
-import { Grid, Download, Sun, Moon } from 'lucide-react';
+import { Grid, Download, Sun, Moon, HelpCircle } from 'lucide-react';
 
 const App: React.FC = () => {
   const { projects, theme, toggleTheme } = useStore();
   const [tsvOpen, setTsvOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // Sync theme with HTML element on mount
   useEffect(() => {
@@ -47,6 +49,15 @@ const App: React.FC = () => {
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
              </button>
 
+             {/* Help Icon */}
+             <button 
+                onClick={() => setHelpOpen(true)}
+                className="p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                title="Quick Reference Guide"
+             >
+                <HelpCircle size={18} />
+             </button>
+
               {projects.length > 0 && (
                    <button 
                       onClick={() => setTsvOpen(true)}
@@ -70,6 +81,7 @@ const App: React.FC = () => {
 
       {/* Modals & Overlays */}
       <TSVModal isOpen={tsvOpen} onClose={() => setTsvOpen(false)} />
+      <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
       <Toast />
 
     </div>
